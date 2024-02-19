@@ -1,0 +1,8 @@
+require_relative 'models/agency'
+require_relative 'models/shape'
+require_relative 'models/path_point'
+require_relative 'models/stop'
+require_relative 'models/route'
+require_relative 'models/block'
+require_relative 'models/trip'
+require_relative 'models/stop_time'
