@@ -23,6 +23,7 @@
         ruby
         rubyPackages.sqlite3
         rubyPackages.activerecord
+        rubyPackages.activesupport
       ];
 
       shellHook = ''
