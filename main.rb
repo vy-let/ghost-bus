@@ -4,7 +4,9 @@ class Main
   def self.main
     if help?
       $stderr.puts <<~HELP
-        uhh. uhhhhhhhh.
+        $ ghost-bus import path/to/unzipped/gtfs/data
+        $ ghost-bus segments 2 outbound
+        $ ghost-bus variations 14 outbound
       HELP
       return
     end
@@ -16,6 +18,14 @@ class Main
     when 'import'
       require_relative 'lib/slurp'
       Slurp.new(gtfs:).setup
+
+    when 'segments'
+      require_relative 'lib/segments'
+      Segments.new(route, dir: direction).display_segments
+
+    when 'variations'
+      require_relative 'lib/segments'
+      Segments.new(route, dir: direction).display_variations
 
     else
       $stderr.puts 'i don’t know what you want me to do. try `--help`'
@@ -42,6 +52,24 @@ class Main
 
   def self.gtfs
     ARGV[1]
+  end
+
+  def self.route
+    require_relative 'lib/models'
+    Route.find_by(short_name: ARGV[1])
+  end
+
+  def self.direction
+    case ARGV[2]
+    when 'outbound', '0'
+      0
+    when 'inbound', '1'
+      1
+    when nil, ''
+      raise ArgumentError, 'direction must be specified (inbound, outbound, 0, 1, 2, ...)'
+    else
+      Integer(ARGV[2])
+    end
   end
 
   def self.show_trace?

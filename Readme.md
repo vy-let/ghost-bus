@@ -25,9 +25,43 @@ The first step to using this tool is to import the schedule data into a local sq
 ./ghost-bus import ~/Downloads/gtfs_kcm
 ```
 
+### Segments and Variations
+
+Suppose you have a line, and you want to find out all the different routes it can take. For instance, your line 2 might start at station A, pass stations B, C, and D, and then fork, either going to stations E and F, or to station G. However, in addition to the fork after D, some inbound trips may only start at C, skipping A and B entirely. Ghost-bus can identify all the actual routing variations that the line takes:
+
+``` fish
+./ghost-bus variations 2 inbound
+```
+
+produces:
+
+```
+[inbound: A -> F (6 stops)]
+[inbound: C -> F (4 stops)]
+[inbound: A -> G (5 stops)]
+```
+
+Similarly, you may want to divide up the line into segments, each having the same "timbre," or set of variations that visit each stop:
+
+``` fish
+./ghost-bus segments 2 inbound
+```
+
+produces:
+
+```
+[inbound: A -> B (2 stops)]
+[inbound: C -> D (2 stops)]
+[inbound: E -> F (2 stops)]
+[inbound: G (1 stop)]
+```
+
+This can be useful for mapping purposes, or identifying where the line needs different calculations for frequency, for example.
+
+
 ### Explore
 
-Automatic statistics calculation isn't implemented yet. Open up a ruby shell
+You can explore the data yourself using friendly ActiveRecord bindings. Open up a ruby shell
 
 ``` fish
 irb

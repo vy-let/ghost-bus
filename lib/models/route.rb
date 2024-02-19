@@ -6,4 +6,13 @@ class Route < ApplicationRecord
 
   belongs_to :agency
   has_many :trips
+
+  # per spec, this *should* always be [0, 1].
+  def directions
+    @directions ||=
+      trips
+        .select(:direction_id).distinct
+        .pluck(:direction_id)
+        .sort
+  end
 end
