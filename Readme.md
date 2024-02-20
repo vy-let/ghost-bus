@@ -25,6 +25,24 @@ The first step to using this tool is to import the schedule data into a local sq
 ./ghost-bus import ~/Downloads/gtfs_kcm
 ```
 
+### Weekly Mean Headway
+
+The mean headway is a rough measure of the level of service of a line. It provides a fair, combined answer to the questions:
+
+1. How often does it run?
+2. How many hours is it in service?
+
+To calculate it for some line "N":
+
+``` fish
+./ghost-bus mean-headway N
+```
+
+The output is divided into the line's **segments** — see below.
+
+It does not address the *reliability* of the service, as it doesn't consider how much variability in headway there is in the day, how long service gaps are, etc. It should be treated as a comparative measure of the **quantity** of service provided.
+
+
 ### Segments and Variations
 
 Suppose you have a line, and you want to find out all the different routes it can take. For instance, your line 2 might start at station A, pass stations B, C, and D, and then fork, either going to stations E and F, or to station G. However, in addition to the fork after D, some inbound trips may only start at C, skipping A and B entirely. Ghost-bus can identify all the actual routing variations that the line takes:

@@ -4,6 +4,7 @@ class Trip < ApplicationRecord
   belongs_to :route
   belongs_to :shape
   belongs_to :block
+  belongs_to :repeat
   has_many :stop_times, ->{ ordered }
   has_many :stops, through: :stop_times
 
@@ -13,4 +14,6 @@ class Trip < ApplicationRecord
   scope :outbound, ->{ where direction_id: 0 }
   scope :inbound, ->{ where direction_id: 1 }
   scope :in_direction, ->(dir) { where direction_id: dir }
+
+  scope :for_route, ->(rt) { joins(:route).where(routes: {id: rt}) }
 end

@@ -5,6 +5,7 @@ class Main
     if help?
       $stderr.puts <<~HELP
         $ ghost-bus import path/to/unzipped/gtfs/data
+        $ ghost-bus mean-headway 60
         $ ghost-bus segments 2 outbound
         $ ghost-bus variations 14 outbound
       HELP
@@ -21,11 +22,19 @@ class Main
 
     when 'segments'
       require_relative 'lib/segments'
-      Segments.new(route, dir: direction).display_segments
+      directions.each do |direction|
+        Segments.new(route, dir: direction).display_segments
+      end
 
     when 'variations'
       require_relative 'lib/segments'
-      Segments.new(route, dir: direction).display_variations
+      directions.each do |direction|
+        Segments.new(route, dir: direction).display_variations
+      end
+
+    when 'mean-headway'
+      require_relative 'lib/headway'
+      Headway.new(route).display_weekly_mean
 
     else
       $stderr.puts 'i don’t know what you want me to do. try `--help`'
@@ -59,14 +68,14 @@ class Main
     Route.find_by(short_name: ARGV[1])
   end
 
-  def self.direction
+  def self.directions
     case ARGV[2]
     when 'outbound', '0'
-      0
+      [0]
     when 'inbound', '1'
-      1
+      [1]
     when nil, ''
-      raise ArgumentError, 'direction must be specified (inbound, outbound, 0, 1, 2, ...)'
+      route.directions
     else
       Integer(ARGV[2])
     end

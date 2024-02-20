@@ -21,6 +21,11 @@ class Slurp
   end
 
   def import_data
+    puts 'importing repeat patterns'
+    with_progress repeats do |r|
+      r.save!
+    end
+
     puts 'importing agencies'
     with_progress agencies do |a|
       a.save!
@@ -99,6 +104,26 @@ class Slurp
     end
   end
 
+  def repeats
+    rows_from("#{gtfs}/calendar.txt").map do |row|
+      st_y, st_m, st_d = row['start_date'].match(/^(\d{4})(\d\d)(\d\d)$/).captures
+      en_y, en_m, en_d = row['end_date'].match(/^(\d{4})(\d\d)(\d\d)$/).captures
+
+      Repeat.new(
+        id: row['service_id'],
+        monday: row['monday'],
+        tuesday: row['tuesday'],
+        wednesday: row['wednesday'],
+        thursday: row['thursday'],
+        friday: row['friday'],
+        saturday: row['saturday'],
+        sunday: row['sunday'],
+        start_date: "#{st_y}-#{st_m}-#{st_d}",
+        end_date: "#{en_y}-#{en_m}-#{en_d}"
+      )
+    end
+  end
+
   def stops
     rows_from("#{gtfs}/stops.txt").map do |row|
       Stop.new(
@@ -147,7 +172,7 @@ class Slurp
         route_id: row['route_id'],
         shape_id: row['shape_id'],
         block_id: row['block_id'],
-        service_id: row['service_id'],
+        repeat_id: row['service_id'],
         direction_id: row['direction_id'],
         headsign: row['trip_headsign'],
         short_name: row['trip_short_name'],
@@ -218,6 +243,18 @@ class SetUpTables < ActiveRecord::Migration[6.0]
       t.decimal :dist_traveled
     end
 
+    create_table :repeats do |t|
+      t.boolean :monday
+      t.boolean :tuesday
+      t.boolean :wednesday
+      t.boolean :thursday
+      t.boolean :friday
+      t.boolean :saturday
+      t.boolean :sunday
+      t.date :start_date
+      t.date :end_date
+    end
+
     create_table :stops do |t|
       t.integer :code # ?
       t.string :name
@@ -251,7 +288,7 @@ class SetUpTables < ActiveRecord::Migration[6.0]
       t.references :route, foreign_key: true
       t.references :shape, foreign_key: true
       t.references :block, foreign_key: true
-      t.integer :service_id # -> ?
+      t.references :repeat, foreign_key: true
       t.integer :direction_id # -> ?
       t.string :headsign
       t.string :short_name
